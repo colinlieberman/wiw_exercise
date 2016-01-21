@@ -83,7 +83,6 @@ Class UserTest extends ServiceTestCase
 
         $content = $this->HTTPRequest( $url, $rsp_headers, $opts );
         
-        print( "\nImplements use case As a manager, I want to contact an employee, by seeing employee details." );
         $this->assertHTTPStatus( $rsp_headers[0], 200 );
     }
 
@@ -139,6 +138,26 @@ Class UserTest extends ServiceTestCase
 
         /* $this->assertHTTPStatus( $rsp_headers[0], 400 ); */
         $this->assertEquals( '{"err":"bad request"}', $content, "Expected auth error got $content" );
+    }
+    
+    public function testUserData() 
+    {
+        print( "\nImplements use case As a manager, I want to contact an employee, by seeing employee details." );
+    
+        $rsp_headers = array();
+        $url = $this->base_url . '/123'; 
+        
+        $opts = array(
+            'CURLOPT_HTTPHEADER' => array(
+                'X-UserID: 1234'
+               ,'X-AuthToken: 0a1b2c3d'
+               ,'X-UserRole: 2'
+            )
+        );
+
+        $content = $this->HTTPRequest( $url, $rsp_headers, $opts );
+        $obj = json_decode( $content );
+        $this->assertEquals( 'Anony Mouse #123', $obj->name );
     }
 
 }
