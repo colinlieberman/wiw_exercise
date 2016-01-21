@@ -1,0 +1,23 @@
+{
+    "name": "equip/adr",
+    "description": "Interfaces for Action Domain Responder pattern",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Equip Contributors",
+            "homepage": "https://github.com/equip"
+        }
+    ],
+    "replaces": {
+        "sparkphp/adr": "self.version"
+    },
+    "require": {
+        "psr/http-message": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Equip\\Adr\\": "src/"
+        }
+    }
+}

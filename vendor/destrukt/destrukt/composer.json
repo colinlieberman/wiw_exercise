@@ -1,0 +1,41 @@
+{
+    "name": "destrukt/destrukt",
+    "description": "Simple, immutable data structures",
+    "keywords": [
+        "data structure",
+        "immutable",
+        "hash map",
+        "hash table",
+        "dictionary",
+        "ordered list",
+        "unordered list",
+        "list",
+        "set"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Destrukt Contributors",
+            "homepage": "https://github.com/sparkphp/spark/graphs/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=5.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.8|^5.0"
+    },
+    "replace": {
+        "shadowhand/destrukt": "self.version"
+    },
+    "autoload": {
+        "psr-4": {
+            "Destrukt\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Destrukt\\": "tests"
+        }
+    }
+}
