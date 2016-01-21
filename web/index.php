@@ -5,6 +5,10 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use Equip\Project\Domain;
 
+function debug_out( $var ) {
+    print "\n" . print_r( $var, 1 ) . "\n";
+}
+
 Equip\Application::build()
 ->setConfiguration([
     Equip\Configuration\AurynConfiguration::class,
@@ -25,6 +29,10 @@ Equip\Application::build()
     return $directory
     ->get('/hello[/{name}]', Domain\Hello::class)
     ->post('/hello[/{name}]', Domain\Hello::class)
+    
+    ->get('/user[/{id}]', Domain\User::class)
+    //->get('/user/{id}[/hours]', Domain\User::class)
+    
     ; // End of routing
 })
 ->run();

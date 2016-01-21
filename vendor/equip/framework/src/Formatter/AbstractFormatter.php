@@ -54,8 +54,12 @@ abstract class AbstractFormatter
             return 500;
         }
 
-        if ($status >= PayloadInterface::INVALID && $status < PayloadInterface::UNKNOWN) {
+        if ($status >= PayloadInterface::INVALID && $status < PayloadInterface::AUTHERR) {
             return 400;
+        }
+
+        if( $status >= PayloadInterface::AUTHERR && $status < PayloadInterface::UNKNOWN) {
+            return 401;
         }
 
         return 520;

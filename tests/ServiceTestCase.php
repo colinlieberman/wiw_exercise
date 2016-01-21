@@ -1,38 +1,49 @@
 <?php
 
-Class ServiceTester extends PHPUnit_Framework_TestCase
+abstract Class ServiceTestCase extends PHPUnit_Framework_TestCase
 {
-    const APP_PATH = '/Users/clieberman/dev/wiw_exercise';
-
-    protected $_ch = null;
+    protected $_ch       = null;
+    protected $_app_path = '';
 
     public function __construct() {
         parent::__construct();
+        
+        /* assume __FILE__ is app_root/tests/ServiceTestCase.php */
+        $this->_app_path = dirname( __FILE__ ) . '/..';
 
-        /* hackety hack: check to see if there's a server running, and if not, start it */
+        /* hackety hack: check to see if there's a server running, and if not, start it
+         * FIXME: replace with phpunit --bootstrap file and appropriate cleanup/teardown
+         * to stop server 
+         */
         if( ! $this->_getServerPid() ) {
-            $app_path = self::APP_PATH; 
-            $sys_cmd  = "${app_path}/bin/start-server > ${app_path}/logs/access.log &> ${app_path}/logs/error.log &";
-            exec( $sys_cmd, $output );
+            $start_bin  = $this->_app_path . '/bin/start-server';
+            $log_path   = $this->_app_path . '/logs/access.log';
+            $error_path = $this->_app_path . '/logs/error.log';
             
+            $sys_cmd  = "${start_bin} >> ${log_path} 2>> ${error_path} &";
+            exec( $sys_cmd, $output );
+
             /* sleep .05 seconds to give server time to start */
             usleep( 50000 );
-       } 
+       }
 
     }
 
     protected function _getServerPid() {
-        return exec( 'lsof -n -i:8000 | awk \'/php/{print $2}\'' );
+        /* FIXME: have server write to pid file; this isn't portable */
+        $pid = exec( 'lsof -n -i:8000 | awk \'/php/{print $2}\'' );
+        /*print "\npid $pid\n";*/
+        return $pid;
     }
 
     protected function _killServer() {
-        exec( 'kill ' . $this->_getServerPid() );
+        $pid = $this->_getServerPid();
+        if( $pid ) {
+            exec( 'kill ' . $this->_getServerPid() );
+        }
     }
 
     public function __destruct() {
-        /* hackety hack kill the webserver; this is only tested on osx; lsof syntax
-         * likely not the same on linux
-         */
         $this->_killServer();
     }
 
@@ -46,8 +57,8 @@ Class ServiceTester extends PHPUnit_Framework_TestCase
         foreach( $methods as $method ) {
             if( $method == 'DELETE' ) {
                 /* delete is handled differently from others */
-                if( $method == $request_method ) { 
-                    curl_setopt( $this->_ch, CURLOPT_CUSTOMREQUEST, $request_method ); 
+                if( $method == $request_method ) {
+                    curl_setopt( $this->_ch, CURLOPT_CUSTOMREQUEST, $request_method );
                }
             }
             else if( $method == 'GET' ) {
@@ -103,7 +114,7 @@ Class ServiceTester extends PHPUnit_Framework_TestCase
         return $headers;
     }
 
-    public function HTTPRequest( $url, &$response_headers=array(), $method='GET', $curl_opts=array() ) {
+    public function HTTPRequest( $url, &$response_headers=array(), $curl_opts=array(), $method='GET' ) {
         $this->_ch = curl_init( $url );
 
         $this->_setMethod( $method );
@@ -111,18 +122,22 @@ Class ServiceTester extends PHPUnit_Framework_TestCase
         foreach( $curl_opts as $opt => $val ) {
             curl_setopt( $this->_ch, constant( $opt ), $val );
         }
-   
-        /* all that jazz for making sure we get all the response headers 
+
+        /* all that jazz for making sure we get all the response headers
          * http://stackoverflow.com/questions/9183178/php-curl-retrieving-response-headers-and-body-in-a-single-request
          */
         curl_setopt( $this->_ch, CURLOPT_RETURNTRANSFER, 1 );
-        //curl_setopt( $this->_ch, CURLOPT_VERBOSE, 1 );
+        /* curl_setopt( $this->_ch, CURLOPT_VERBOSE, 1 ); */
         curl_setopt( $this->_ch, CURLOPT_HEADER, 1 );
+        curl_setopt( $this->_ch, CURLINFO_HEADER_OUT, true );
 
         $response = curl_exec( $this->_ch );
         $header_size = curl_getinfo( $this->_ch, CURLINFO_HEADER_SIZE );
-        curl_close( $this->_ch );
         
+        //print "\ncurl info: " . print_r( curl_getinfo( $this->_ch, CURLINFO_HEADER_OUT ), 1 ) . "\n";
+        
+        curl_close( $this->_ch );
+
         $header = substr( $response, 0, $header_size );
         $body = substr( $response, $header_size );
 
@@ -130,4 +145,10 @@ Class ServiceTester extends PHPUnit_Framework_TestCase
 
         return $body;
     }
+
+    public function assertHTTPStatus( $http_header, $status, $msg='')  {
+        $msg = $msg ? $msg : "Got status ${http_header}, expected ${status}";
+        $this->assertTrue( strpos( $http_header, "HTTP/1.1 ${status} " ) === 0, $msg );
+    }
+
 }

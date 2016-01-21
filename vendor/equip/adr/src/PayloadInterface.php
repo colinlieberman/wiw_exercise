@@ -25,6 +25,11 @@ interface PayloadInterface
     const UNKNOWN = 40;
 
     /**
+     * @var integer auth error
+     */
+    const AUTHERR = 50;
+
+    /**
      * Create a copy of the payload with the status.
      *
      * @param int $status
