@@ -4,7 +4,7 @@ namespace Equip\Project\DAL;
 
 class User extends DAL
 {
-    public $object_dir = 'users';
+    protected $_object_dir = 'users';
     
     public $id;
     public $name;
@@ -16,7 +16,7 @@ class User extends DAL
 
     public function __construct( $id )
     {
-        $data_obj = $this->fetchObject( $this->object_dir, $id );
+        $data_obj = $this->fetchObject( $this->_object_dir, $id );
         
         /* TODO: type checking values */
     	
@@ -55,6 +55,26 @@ class User extends DAL
         );
     }
 
+    public function shifts( $date=null, $show_all_workers=false )
+    {
+        /* again, not going to write something to 
+         * parse a bunch of json files for what ultimately
+         * is an sql query - ill just grab a few for their
+         * data and mock up the show_all_works bit
+         *
+         * in the real world, 
+         */
+        
+        $response = array();
+
+        $shifts = array( 222, 223, 224 );
+        foreach( $shifts as $shift_id ) 
+        {
+            $response[ $shift_id ] = new Shift( $shift_id, $show_all_workers );
+        }
+    
+        return $response;
+    }
 
 
 }

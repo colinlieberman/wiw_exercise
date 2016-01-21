@@ -5,7 +5,8 @@ abstract Class ServiceTestCase extends PHPUnit_Framework_TestCase
     protected $_ch       = null;
     protected $_app_path = '';
 
-    public function __construct() {
+    public function __construct() 
+    {
         parent::__construct();
         
         /* assume __FILE__ is app_root/tests/ServiceTestCase.php */
@@ -41,7 +42,8 @@ abstract Class ServiceTestCase extends PHPUnit_Framework_TestCase
     protected function _killServer() 
     {
         $pid = $this->_getServerPid();
-        if( $pid ) {
+        if( $pid ) 
+        {
             exec( 'kill ' . $this->_getServerPid() );
         }
     }
@@ -55,21 +57,27 @@ abstract Class ServiceTestCase extends PHPUnit_Framework_TestCase
     {
         $methods = array( 'GET', 'POST', 'PUT', 'DELETE' );
 
-        if( !in_array( $request_method, $methods ) ) {
+        if( !in_array( $request_method, $methods ) ) 
+        {
             throw new Exception( "method $request_method not supported" );
         }
 
-        foreach( $methods as $method ) {
-            if( $method == 'DELETE' ) {
+        foreach( $methods as $method ) 
+        {
+            if( $method == 'DELETE' ) 
+            {
                 /* delete is handled differently from others */
-                if( $method == $request_method ) {
+                if( $method == $request_method ) 
+                {
                     curl_setopt( $this->_ch, CURLOPT_CUSTOMREQUEST, $request_method );
                }
             }
-            else if( $method == 'GET' ) {
+            else if( $method == 'GET' ) 
+            {
                 curl_setopt( $this->_ch, CURLOPT_HTTPGET, $request_method == 'GET' );
             }
-            else {
+            else 
+            {
                 /* otherwise, set true or false as needed */
                 curl_setopt( $this->_ch, constant( 'CURLOPT_' . $method ), $method == $request_method );
             }

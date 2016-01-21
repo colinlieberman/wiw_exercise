@@ -32,7 +32,16 @@ Equip\Application::build()
     
     ->get('/user/{id}', Domain\User::class)
     ->get('/user/{id}/hours', Domain\UserHours::class)
+    ->get('/user/{id}/shifts', Domain\UserShifts::class)
+  
+    /* there's not a specific use case for this (yet) but one
+     * could well imagine it
+     */
+    ->get('/shift/{id}', Domain\Shift::class)
+    ->put('/shift/{id}', Domain\Shift::class)
+    ->post('/shift', Domain\Shift::class)
     
+    ->get('/shifts', Domain\ShiftShedule::class)
     ; // End of routing
 })
 ->run();

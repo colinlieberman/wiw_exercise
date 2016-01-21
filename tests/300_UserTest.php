@@ -22,7 +22,8 @@ Class UserTest extends ServiceTestCase
         $this->assertEquals( $this->auth_err_content, $content, "Expected auth error got $content" );
     }
 
-    public function testIncompleteAuth() {
+    public function testIncompleteAuth()
+    {
         /* test auth with parts of auth but not complete set */
     
         $rsp_headers = array();
@@ -141,8 +142,6 @@ Class UserTest extends ServiceTestCase
     
     public function testUserData() 
     {
-        print( "\nImplements use case As a manager, I want to contact an employee, by seeing employee details." );
-    
         $rsp_headers = array();
         $url = $this->base_url . '/123'; 
         
@@ -156,6 +155,8 @@ Class UserTest extends ServiceTestCase
 
         $content = $this->HTTPRequest( $url, $rsp_headers, $opts );
         $obj = json_decode( $content );
+        
+        print( "\nAs a manager, I want to contact an employee, by seeing employee details." );
         $this->assertEquals( 'Anony Mouse #123', $obj->name );
     }
 
@@ -179,8 +180,6 @@ Class UserTest extends ServiceTestCase
 
     public function testUserHours()
     {
-        print( "\nImplements use case As an employee, I want to know how much I worked, by being able to get a summary of hours worked for each week." );
-    
         $rsp_headers = array();
         $url = $this->base_url . '/123/hours'; 
         
@@ -194,8 +193,40 @@ Class UserTest extends ServiceTestCase
 
         $content = $this->HTTPRequest( $url, $rsp_headers, $opts );
         $obj = json_decode( $content, 1 );
+        
+        print( "\nAs an employee, I want to know how much I worked, by being able to get a summary of hours worked for each week." );
         $this->assertEquals( $obj[0]['date'], '2016-01-04' );
         $this->assertEquals( $obj[0]['hours'], '38' );
+    }
+
+    public function testUserShifts()
+    {
+        $rsp_headers = array();
+        $url = $this->base_url . '/123/shifts'; 
+        
+        $opts = array(
+            'CURLOPT_HTTPHEADER' => array(
+                'X-UserID: 123'
+               ,'X-AuthToken: 0a1b2c3d'
+               ,'X-UserRole: 1'
+            )
+        );
+
+        $content = $this->HTTPRequest( $url, $rsp_headers, $opts );
+        $obj = json_decode( $content, 1 );
+
+
+        print "\nAs an employee, I want to know when I am working, by being able to see all of the shifts assigned to me.";
+        $this->assertTrue( isset( $obj[ 222 ] ) );
+
+
+        print "\nAs an employee, I want to know who I am working with, by being able to see the employees that are working during the same time period as me.";
+        $this->assertTrue( isset( $obj[ 222 ][ 'workers' ] ) );
+        $this->assertGreaterThan( 1, sizeof( $obj[ 222 ][ 'workers' ] ) );
+
+
+        print "\nAs an employee, I want to be able to contact my managers, by seeing manager contact information for my shifts.";
+        $this->assertEquals( $obj[ 222 ][ 'manager' ][ 'id' ], 9876 );
     }
 
 }

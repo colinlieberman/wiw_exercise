@@ -45,7 +45,8 @@ abstract Class DAL
         return $object;
     }
 
-    public function toArray() {
+    public function toArray() 
+    {
         return json_decode( $this->_obj_json, true );
     }
 }
