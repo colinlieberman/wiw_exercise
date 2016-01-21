@@ -136,8 +136,7 @@ Class UserTest extends ServiceTestCase
 
         $content = $this->HTTPRequest( $url, $rsp_headers, $opts );
 
-        /* $this->assertHTTPStatus( $rsp_headers[0], 400 ); */
-        $this->assertEquals( '{"err":"bad request"}', $content, "Expected auth error got $content" );
+        $this->assertHTTPStatus( $rsp_headers[0], 404 );
     }
     
     public function testUserData() 
@@ -158,6 +157,45 @@ Class UserTest extends ServiceTestCase
         $content = $this->HTTPRequest( $url, $rsp_headers, $opts );
         $obj = json_decode( $content );
         $this->assertEquals( 'Anony Mouse #123', $obj->name );
+    }
+
+    public function testTryDataForOtherUser()
+    {
+        $rsp_headers = array();
+        $url = $this->base_url . '/234'; 
+        
+        $opts = array(
+            'CURLOPT_HTTPHEADER' => array(
+                'X-UserID: 1234'
+               ,'X-AuthToken: 0a1b2c3d'
+               ,'X-UserRole: 1'
+            )
+        );
+
+        $content = $this->HTTPRequest( $url, $rsp_headers, $opts );
+        /* $this->assertHTTPStatus( $rsp_headers[0], 401 ); */
+        $this->assertEquals( $this->auth_err_content, $content, "Expected auth error got $content" );
+    }
+
+    public function testUserHours()
+    {
+        print( "\nImplements use case As an employee, I want to know how much I worked, by being able to get a summary of hours worked for each week." );
+    
+        $rsp_headers = array();
+        $url = $this->base_url . '/123/hours'; 
+        
+        $opts = array(
+            'CURLOPT_HTTPHEADER' => array(
+                'X-UserID: 123'
+               ,'X-AuthToken: 0a1b2c3d'
+               ,'X-UserRole: 1'
+            )
+        );
+
+        $content = $this->HTTPRequest( $url, $rsp_headers, $opts );
+        $obj = json_decode( $content, 1 );
+        $this->assertEquals( $obj[0]['date'], '2016-01-04' );
+        $this->assertEquals( $obj[0]['hours'], '38' );
     }
 
 }

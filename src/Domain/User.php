@@ -22,19 +22,19 @@ class User extends AuthenticatedDomain
     }
 
     /**
-     * @inheritDoc
+     * @_validateUserRequest
+     *
+     * @param array input from __invoke method
+     * 
+     * @returns payload return object or false if there's nothing to return immediately (request is so far so good)
      */
-    public function __invoke(array $input)
+    protected function _validateUserRequest( array $input )
     {
         /* FIXME: I'm sure there's a better way to drop the request on the floor 
          * in the constructor; need to learn how to do that
          */
+        
         if( $this->_auth_status != PayloadInterface::OK ) 
-        {
-            return $this->_returnAuthError( $this->payload );
-        }
-
-        if( $this->_user_role != self::ROLE_MANAGER ) 
         {
             return $this->_returnAuthError( $this->payload );
         }
@@ -49,6 +49,34 @@ class User extends AuthenticatedDomain
              * and even 0 results for header
              */
             return $this->_returnBadRequest( $this->payload );
+        }
+
+        /* if the request is on a user role, ensure user's only trying
+         * for their own data
+         */
+        if( $this->_rx_headers[ 'X-UserRole' ] == self::ROLE_USER 
+                && $input[ 'id' ] != $this->_rx_headers[ 'X-UserID' ] )
+        {
+            return $this->_returnAuthError( $this->payload );
+        }
+
+        return false;
+    }
+    /**
+     * @inheritDoc
+     */
+    public function __invoke(array $input)
+    {
+        $return_obj = $this->_validateUserRequest( $input );
+
+        if( $return_obj ) 
+        {
+            return $return_obj;
+        }
+
+        if( $this->_user_role != self::ROLE_MANAGER ) 
+        {
+            return $this->_returnAuthError( $this->payload );
         }
 
         $id = $input[ 'id' ];

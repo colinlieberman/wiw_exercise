@@ -30,8 +30,8 @@ Equip\Application::build()
     ->get('/hello[/{name}]', Domain\Hello::class)
     ->post('/hello[/{name}]', Domain\Hello::class)
     
-    ->get('/user[/{id}]', Domain\User::class)
-    //->get('/user/{id}[/hours]', Domain\User::class)
+    ->get('/user/{id}', Domain\User::class)
+    ->get('/user/{id}/hours', Domain\UserHours::class)
     
     ; // End of routing
 })

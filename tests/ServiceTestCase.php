@@ -15,7 +15,8 @@ abstract Class ServiceTestCase extends PHPUnit_Framework_TestCase
          * FIXME: replace with phpunit --bootstrap file and appropriate cleanup/teardown
          * to stop server 
          */
-        if( ! $this->_getServerPid() ) {
+        if( ! $this->_getServerPid() ) 
+        {
             $start_bin  = $this->_app_path . '/bin/start-server';
             $log_path   = $this->_app_path . '/logs/access.log';
             $error_path = $this->_app_path . '/logs/error.log';
@@ -29,25 +30,29 @@ abstract Class ServiceTestCase extends PHPUnit_Framework_TestCase
 
     }
 
-    protected function _getServerPid() {
+    protected function _getServerPid() 
+    {
         /* FIXME: have server write to pid file; this isn't portable */
         $pid = exec( 'lsof -n -i:8000 | awk \'/php/{print $2}\'' );
         /*print "\npid $pid\n";*/
         return $pid;
     }
 
-    protected function _killServer() {
+    protected function _killServer() 
+    {
         $pid = $this->_getServerPid();
         if( $pid ) {
             exec( 'kill ' . $this->_getServerPid() );
         }
     }
 
-    public function __destruct() {
+    public function __destruct() 
+    {
         $this->_killServer();
     }
 
-    protected function _setMethod( $request_method ) {
+    protected function _setMethod( $request_method ) 
+    {
         $methods = array( 'GET', 'POST', 'PUT', 'DELETE' );
 
         if( !in_array( $request_method, $methods ) ) {
@@ -114,12 +119,14 @@ abstract Class ServiceTestCase extends PHPUnit_Framework_TestCase
         return $headers;
     }
 
-    public function HTTPRequest( $url, &$response_headers=array(), $curl_opts=array(), $method='GET' ) {
+    public function HTTPRequest( $url, &$response_headers=array(), $curl_opts=array(), $method='GET' ) 
+    {
         $this->_ch = curl_init( $url );
 
         $this->_setMethod( $method );
 
-        foreach( $curl_opts as $opt => $val ) {
+        foreach( $curl_opts as $opt => $val ) 
+        {
             curl_setopt( $this->_ch, constant( $opt ), $val );
         }
 
@@ -146,7 +153,8 @@ abstract Class ServiceTestCase extends PHPUnit_Framework_TestCase
         return $body;
     }
 
-    public function assertHTTPStatus( $http_header, $status, $msg='')  {
+    public function assertHTTPStatus( $http_header, $status, $msg='')  
+    {
         $msg = $msg ? $msg : "Got status ${http_header}, expected ${status}";
         $this->assertTrue( strpos( $http_header, "HTTP/1.1 ${status} " ) === 0, $msg );
     }

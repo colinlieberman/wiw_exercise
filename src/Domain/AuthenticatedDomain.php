@@ -19,7 +19,11 @@ abstract class AuthenticatedDomain implements DomainInterface
 
     protected function _validateAuth( $payload ) 
     {
-       /* TODO: actually validate token, etc */
+       /* TODO: actually validate token, etc 
+        * this would have some kind of shared secret,
+        * like an API key, and an expiry timestamp
+        * hashed along with user id and role
+        */
        return true;
     }
 
